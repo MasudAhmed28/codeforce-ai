@@ -1,0 +1,23 @@
+{
+  "packageDirectories": [
+    {
+      "versionName": "ver 0.1",
+      "versionNumber": "0.1.0.NEXT",
+      "path": "force-app",
+      "default": true,
+      "package": "CodeForce AI",
+      "versionDescription": ""
+    }
+  ],
+  "name": "codeforce-ai",
+  "namespace": "MDC_AI",
+  "sfdcLoginUrl": "https://login.salesforce.com",
+  "sourceApiVersion": "62.0",
+  "packageAliases": {
+    "CodeForce AI": "0HoIf000000k9bSKAQ",
+    "CodeForce AI@0.1.0-1": "04tIf000000xEPIIA2",
+    "CodeForce AI@0.1.0-2": "04tIf000000xEPSIA2",
+    "CodeForce AI@0.1.0-3": "04tIf000000xEXxIAM",
+    "CodeForce AI@0.1.0-4": "04tIf000000xEY2IAM"
+  }
+}

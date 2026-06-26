@@ -1,0 +1,134 @@
+<template>
+    <!-- ── Header ── -->
+    <div class="header-bar">
+        <div class="header-content">
+            <lightning-icon icon-name="utility:settings" size="medium"></lightning-icon>
+            <div class="header-text">
+                <h1>CodeForce AI — Settings</h1>
+                <p>Configure your Gemini API connection</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="settings-container">
+        <!-- ── Connection Status Card ── -->
+        <div class="status-card">
+            <div class="status-header">
+                <h2>Connection Status</h2>
+                <lightning-button
+                    variant="brand"
+                    label={testButtonLabel}
+                    onclick={handleTestConnection}
+                    disabled={isTesting}
+                    icon-name="utility:refresh">
+                </lightning-button>
+            </div>
+
+            <template lwc:if={connectionSuccess}>
+                <div class="status-banner status-ok">
+                    <lightning-icon icon-name="utility:success" variant="inverse" size="small"></lightning-icon>
+                    <span>{connectionMessage}</span>
+                </div>
+            </template>
+
+            <template lwc:if={connectionError}>
+                <div class="status-banner status-error">
+                    <lightning-icon icon-name="utility:error" variant="inverse" size="small"></lightning-icon>
+                    <span>{connectionMessage}</span>
+                </div>
+            </template>
+
+            <template lwc:if={showDefault}>
+                <div class="status-banner status-default">
+                    <lightning-icon icon-name="utility:info" size="small"></lightning-icon>
+                    <span>Click <strong>Test Connection</strong> to verify your Gemini API key is configured.</span>
+                </div>
+            </template>
+        </div>
+
+        <!-- ── Setup Instructions Card ── -->
+        <div class="setup-card">
+            <h2>Setup Instructions</h2>
+            <p class="setup-intro">
+                CodeForce AI uses <strong>Google Gemini</strong> for AI-powered code reviews.
+                Follow these steps to connect your free API key:
+            </p>
+
+            <div class="steps">
+                <div class="step">
+                    <div class="step-number">1</div>
+                    <div class="step-content">
+                        <h3>Get a Free Gemini API Key</h3>
+                        <p>
+                            Go to <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener noreferrer">
+                            Google AI Studio</a> and click <strong>"Create API Key"</strong>.
+                            Copy the generated key.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <div class="step-content">
+                        <h3>Open External Credentials</h3>
+                        <p>
+                            In Salesforce Setup, search for <strong>"Named Credentials"</strong>,
+                            then click the <strong>"External Credentials"</strong> tab.
+                            Find and click <strong>"Gemini AI"</strong>.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <div class="step-content">
+                        <h3>Add Your API Key</h3>
+                        <p>
+                            Under the <strong>"Principals"</strong> section, click the arrow next to <strong>NamedPrincipal</strong>
+                            and select <strong>"Edit"</strong>. Under <strong>Authentication Parameters</strong>, click <strong>Add</strong>.
+                            Set the <strong>Name</strong> to <code>ApiKey</code> and the <strong>Value</strong> to your Gemini API key. Click <strong>Save</strong>.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="step">
+                    <div class="step-number">4</div>
+                    <div class="step-content">
+                        <h3>Grant Access to Users</h3>
+                        <p>
+                            Go to <strong>Setup → Permission Sets → CodeForce AI User → External Credential Principal Access</strong>.
+                            Click <strong>Edit</strong>, add <strong>"Gemini AI - NamedPrincipal"</strong> 
+                            to the Enabled list, and click <strong>Save</strong>.
+                            Then assign this permission set to users who need code review access.
+                        </p>
+                    </div>
+                </div>
+
+
+                <div class="step">
+                    <div class="step-number">5</div>
+                    <div class="step-content">
+                        <h3>Test the Connection</h3>
+                        <p>
+                            Click the <strong>"Test Connection"</strong> button above to verify everything is working.
+                            If successful, you're ready to review code!
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ── Info Card ── -->
+        <div class="info-card">
+            <lightning-icon icon-name="utility:info_alt" size="small"></lightning-icon>
+            <div class="info-content">
+                <strong>About the Free Tier</strong>
+                <p>
+                    The Gemini API free tier supports up to 15 requests per minute.
+                    This is sufficient for individual and small-team code reviews.
+                    Your API key and code are sent directly to Google's Gemini API — no intermediary servers.
+                </p>
+            </div>
+        </div>
+    </div>
+</template>

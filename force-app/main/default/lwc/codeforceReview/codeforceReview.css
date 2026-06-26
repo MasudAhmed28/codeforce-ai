@@ -1,0 +1,320 @@
+/* ── CodeForce AI — single-component styles ── */
+
+/* Reset & layout */
+:host {
+    display: block;
+    font-family: 'Salesforce Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: #f4f6f9;
+    min-height: 100vh;
+}
+
+/* ── Header ── */
+.header-bar {
+    background: linear-gradient(135deg, #032d60 0%, #0070d2 50%, #1b96ff 100%);
+    padding: 1.25rem 2rem;
+    color: white;
+}
+.header-content {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+.header-text h1 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin: 0;
+}
+.header-text p {
+    margin: 0.15rem 0 0;
+    font-size: 0.85rem;
+    opacity: 0.85;
+}
+
+/* ── Main two-column layout ── */
+.main-container {
+    display: flex;
+    gap: 1.5rem;
+    max-width: 1400px;
+    margin: 1.5rem auto;
+    padding: 0 2rem;
+}
+.input-panel {
+    flex: 1;
+    min-width: 0;
+}
+.results-panel {
+    flex: 1;
+    min-width: 0;
+}
+
+/* ── Card ── */
+.panel-card {
+    background: white;
+    border-radius: 0.5rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    padding: 1.25rem;
+}
+.panel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.75rem;
+}
+.panel-header h2 {
+    font-size: 1.05rem;
+    font-weight: 600;
+    margin: 0;
+    color: #181818;
+}
+.lang-picker {
+    width: 160px;
+}
+
+/* ── Code input ── */
+.code-input {
+    width: 100%;
+    min-height: 420px;
+    padding: 1rem;
+    font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+    font-size: 0.82rem;
+    line-height: 1.6;
+    border: 1px solid #d8dde6;
+    border-radius: 0.375rem;
+    background: #1e1e1e;
+    color: #d4d4d4;
+    resize: vertical;
+    tab-size: 4;
+    box-sizing: border-box;
+}
+.code-input::placeholder {
+    color: #6a737d;
+}
+.code-input:focus {
+    outline: none;
+    border-color: #0070d2;
+    box-shadow: 0 0 0 1px #0070d2;
+}
+
+/* ── Actions ── */
+.action-bar {
+    display: flex;
+    gap: 0.75rem;
+    margin-top: 1rem;
+}
+.review-btn {
+    flex: 1;
+}
+
+/* ── Loading ── */
+.loading-card {
+    background: white;
+    border-radius: 0.5rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    padding: 4rem 2rem;
+    text-align: center;
+}
+.loading-text {
+    margin-top: 1.5rem;
+    color: #706e6b;
+    font-size: 0.95rem;
+}
+
+/* ── Error ── */
+.error-card {
+    background: #fef0ef;
+    border: 1px solid #ea001e;
+    border-radius: 0.5rem;
+    padding: 1rem 1.25rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    color: #8e030f;
+    font-size: 0.9rem;
+}
+
+/* ── Score banner ── */
+.score-banner {
+    border-radius: 0.5rem;
+    padding: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    margin-bottom: 1rem;
+    color: white;
+    background: #54698d;
+}
+.score-banner.score-great { background: linear-gradient(135deg, #2e844a, #45c65a); }
+.score-banner.score-ok    { background: linear-gradient(135deg, #e87400, #fe9339); }
+.score-banner.score-bad   { background: linear-gradient(135deg, #c23934, #ea001e); }
+
+.score-circle {
+    min-width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.2);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+.score-number {
+    font-size: 1.75rem;
+    font-weight: 800;
+    line-height: 1;
+}
+.score-label {
+    font-size: 0.7rem;
+    opacity: 0.8;
+}
+.score-summary {
+    margin: 0;
+    font-size: 0.95rem;
+    line-height: 1.4;
+}
+
+/* ── Badges ── */
+.badge-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+}
+.badge {
+    padding: 0.25rem 0.75rem;
+    border-radius: 1rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+.badge-critical { background: #fef0ef; color: #c23934; border: 1px solid #ea001e; }
+.badge-high     { background: #fff7e6; color: #a96404; border: 1px solid #e87400; }
+.badge-medium   { background: #eef4ff; color: #0b5cab; border: 1px solid #0070d2; }
+.badge-low      { background: #f3f2f2; color: #514f4d; border: 1px solid #c9c7c5; }
+.badge-clean    { background: #ebf7e6; color: #2e844a; border: 1px solid #45c65a; }
+
+/* ── Issue cards ── */
+.issue-card {
+    background: white;
+    border-radius: 0.5rem;
+    border-left: 4px solid #d8dde6;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+    margin-bottom: 0.75rem;
+    overflow: hidden;
+}
+.issue-critical { border-left-color: #ea001e; }
+.issue-high     { border-left-color: #e87400; }
+.issue-medium   { border-left-color: #0070d2; }
+.issue-low      { border-left-color: #c9c7c5; }
+
+.issue-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.85rem 1rem;
+    cursor: pointer;
+    transition: background 0.15s;
+}
+.issue-header:hover {
+    background: #f7f9fb;
+}
+
+.severity-tag {
+    font-size: 0.65rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 0.2rem 0.5rem;
+    border-radius: 0.25rem;
+    white-space: nowrap;
+}
+.sev-critical { background: #ea001e; color: white; }
+.sev-high     { background: #e87400; color: white; }
+.sev-medium   { background: #0070d2; color: white; }
+.sev-low      { background: #ecebea; color: #514f4d; }
+
+.issue-title {
+    flex: 1;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #181818;
+}
+.chevron {
+    flex-shrink: 0;
+}
+
+/* ── Issue body ── */
+.issue-body {
+    padding: 0 1rem 1rem;
+    border-top: 1px solid #f3f2f2;
+}
+.issue-section {
+    margin-top: 0.85rem;
+}
+.issue-section strong {
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    color: #706e6b;
+    display: block;
+    margin-bottom: 0.25rem;
+}
+.issue-section p {
+    margin: 0;
+    font-size: 0.88rem;
+    line-height: 1.5;
+    color: #3e3e3c;
+}
+.fix-section {
+    background: #f0fce8;
+    border-radius: 0.375rem;
+    padding: 0.75rem;
+    margin-top: 0.85rem;
+}
+.fix-section strong {
+    color: #2e844a;
+}
+
+/* ── Code block ── */
+.code-block {
+    background: #1e1e1e;
+    color: #d4d4d4;
+    font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+    font-size: 0.8rem;
+    line-height: 1.5;
+    padding: 0.85rem 1rem;
+    border-radius: 0.375rem;
+    overflow-x: auto;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    margin-top: 0.35rem;
+}
+
+/* ── Empty state ── */
+.empty-state {
+    background: white;
+    border-radius: 0.5rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    padding: 4rem 2rem;
+    text-align: center;
+    color: #706e6b;
+}
+.empty-state h3 {
+    margin: 1rem 0 0.25rem;
+    color: #3e3e3c;
+}
+.empty-state p {
+    margin: 0;
+    font-size: 0.9rem;
+}
+
+/* ── Responsive ── */
+@media (max-width: 900px) {
+    .main-container {
+        flex-direction: column;
+        padding: 0 1rem;
+    }
+    .code-input {
+        min-height: 260px;
+    }
+}

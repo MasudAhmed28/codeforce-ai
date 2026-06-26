@@ -1,0 +1,152 @@
+<template>
+    <!-- ── Header ── -->
+    <div class="header-bar">
+        <div class="header-content">
+            <lightning-icon icon-name="custom:custom63" size="medium"></lightning-icon>
+            <div class="header-text">
+                <h1>CodeForce AI</h1>
+                <p>Paste your Salesforce code — AI finds issues &amp; suggests fixes</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="main-container">
+        <!-- ── Left: Code Input ── -->
+        <div class="input-panel">
+            <div class="panel-card">
+                <div class="panel-header">
+                    <h2>Your Code</h2>
+                    <lightning-combobox
+                        label="Language"
+                        value={language}
+                        options={languageOptions}
+                        onchange={handleLanguageChange}
+                        variant="label-hidden"
+                        class="lang-picker">
+                    </lightning-combobox>
+                </div>
+
+                <textarea
+                    class="code-input"
+                    placeholder="Paste your Apex, Trigger, Batch, Queueable, or LWC code here..."
+                    value={code}
+                    oninput={handleCodeChange}
+                    spellcheck="false"></textarea>
+
+                <div class="action-bar">
+                    <lightning-button
+                        variant="brand"
+                        label={reviewButtonLabel}
+                        onclick={handleReview}
+                        disabled={isReviewDisabled}
+                        icon-name="utility:search"
+                        class="review-btn">
+                    </lightning-button>
+                    <lightning-button
+                        variant="neutral"
+                        label="Clear"
+                        onclick={handleClear}
+                        icon-name="utility:delete">
+                    </lightning-button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ── Right: Results ── -->
+        <div class="results-panel">
+            <!-- Loading state -->
+            <template lwc:if={isLoading}>
+                <div class="loading-card">
+                    <lightning-spinner alternative-text="Reviewing..." size="large"></lightning-spinner>
+                    <p class="loading-text">AI is reviewing your code...</p>
+                </div>
+            </template>
+
+            <!-- Error state -->
+            <template lwc:if={errorMessage}>
+                <div class="error-card">
+                    <lightning-icon icon-name="utility:error" variant="error" size="small"></lightning-icon>
+                    <span>{errorMessage}</span>
+                </div>
+            </template>
+
+            <!-- Results -->
+            <template lwc:if={hasResults}>
+                <!-- Score banner -->
+                <div class={scoreBannerClass}>
+                    <div class="score-circle">
+                        <span class="score-number">{result.score}</span>
+                        <span class="score-label">/ 100</span>
+                    </div>
+                    <p class="score-summary">{result.summary}</p>
+                </div>
+
+                <!-- Issue count badges -->
+                <div class="badge-row">
+                    <template lwc:if={criticalCount}>
+                        <span class="badge badge-critical">{criticalCount} Critical</span>
+                    </template>
+                    <template lwc:if={highCount}>
+                        <span class="badge badge-high">{highCount} High</span>
+                    </template>
+                    <template lwc:if={mediumCount}>
+                        <span class="badge badge-medium">{mediumCount} Medium</span>
+                    </template>
+                    <template lwc:if={lowCount}>
+                        <span class="badge badge-low">{lowCount} Low</span>
+                    </template>
+                    <template lwc:if={noIssues}>
+                        <span class="badge badge-clean">✓ No issues found</span>
+                    </template>
+                </div>
+
+                <!-- Issue cards -->
+                <template for:each={result.issues} for:item="issue" for:index="idx">
+                    <div key={issue.title} class={issue.cardClass}>
+                        <div class="issue-header" onclick={toggleIssue} data-index={idx}>
+                            <span class={issue.severityClass}>{issue.severity}</span>
+                            <span class="issue-title">{issue.title}</span>
+                            <lightning-icon
+                                icon-name={issue.chevron}
+                                size="xx-small"
+                                class="chevron">
+                            </lightning-icon>
+                        </div>
+
+                        <template lwc:if={issue.expanded}>
+                            <div class="issue-body">
+                                <div class="issue-section">
+                                    <strong>Why this is a problem</strong>
+                                    <p>{issue.explanation}</p>
+                                </div>
+                                <div class="issue-section">
+                                    <strong>Impact</strong>
+                                    <p>{issue.impact}</p>
+                                </div>
+                                <div class="issue-section fix-section">
+                                    <strong>Recommended Fix</strong>
+                                    <p>{issue.fix}</p>
+                                </div>
+                                <template lwc:if={issue.sampleCode}>
+                                    <div class="issue-section">
+                                        <strong>Corrected Code</strong>
+                                        <pre class="code-block">{issue.sampleCode}</pre>
+                                    </div>
+                                </template>
+                            </div>
+                        </template>
+                    </div>
+                </template>
+            </template>
+
+            <!-- Empty state -->
+            <template lwc:if={showEmptyState}>
+                <div class="empty-state">
+                    <lightning-icon icon-name="utility:magicwand" size="large"></lightning-icon>
+                    <h3>Ready to review</h3>
+                    <p>Paste your code on the left and click <strong>Review Code</strong></p>
+                </div>
+            </template>
+        </div>
+    </div>
+</template>
