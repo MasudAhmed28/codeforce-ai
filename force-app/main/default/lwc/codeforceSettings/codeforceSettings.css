@@ -38,27 +38,43 @@
     padding: 0 2rem;
 }
 
-/* ── Status Card ── */
-.status-card {
+/* ── Config Card ── */
+.config-card {
     background: white;
     border-radius: 0.5rem;
     box-shadow: 0 2px 8px rgba(0,0,0,0.08);
     padding: 1.5rem;
     margin-bottom: 1.5rem;
 }
-.status-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 1rem;
-}
-.status-header h2 {
+.config-card h2 {
     font-size: 1.1rem;
     font-weight: 600;
-    margin: 0;
+    margin: 0 0 1.25rem;
     color: #181818;
 }
 
+/* ── Form Layout ── */
+.form-row {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+.form-field {
+    flex: 1;
+}
+.form-field-wide {
+    flex: 2;
+}
+
+/* ── Action Bar ── */
+.action-bar {
+    display: flex;
+    gap: 0.75rem;
+    margin-top: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+/* ── Status Banners ── */
 .status-banner {
     display: flex;
     align-items: center;
@@ -66,6 +82,7 @@
     padding: 1rem 1.25rem;
     border-radius: 0.5rem;
     font-size: 0.9rem;
+    margin-top: 0.5rem;
 }
 .status-ok {
     background: linear-gradient(135deg, #2e844a, #45c65a);
@@ -74,11 +91,6 @@
 .status-error {
     background: linear-gradient(135deg, #c23934, #ea001e);
     color: white;
-}
-.status-default {
-    background: #eef4ff;
-    color: #0b5cab;
-    border: 1px solid #b0c4de;
 }
 
 /* ── Setup Card ── */
@@ -92,14 +104,8 @@
 .setup-card h2 {
     font-size: 1.1rem;
     font-weight: 600;
-    margin: 0 0 0.5rem;
+    margin: 0 0 1rem;
     color: #181818;
-}
-.setup-intro {
-    font-size: 0.9rem;
-    color: #3e3e3c;
-    margin: 0 0 1.25rem;
-    line-height: 1.5;
 }
 
 /* ── Steps ── */
@@ -185,5 +191,8 @@
     }
     .header-bar {
         padding: 1rem;
+    }
+    .form-row {
+        flex-direction: column;
     }
 }

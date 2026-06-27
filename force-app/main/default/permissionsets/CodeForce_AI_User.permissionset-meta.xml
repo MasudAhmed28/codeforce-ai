@@ -12,7 +12,7 @@
         <apexClass>CodeReviewService</apexClass>
         <enabled>true</enabled>
     </classAccesses>
-    <description>Grants access to CodeForce AI application, objects, Apex classes, and Gemini API credential.</description>
+    <description>Grants access to CodeForce AI application, objects, and Apex classes.</description>
     <fieldPermissions>
         <editable>true</editable>
         <field>Code_Review__c.Issues_JSON__c</field>
@@ -61,8 +61,4 @@
         <tab>Code_Review__c</tab>
         <visibility>Visible</visibility>
     </tabSettings>
-    <externalCredentialPrincipalAccesses>
-        <enabled>true</enabled>
-        <externalCredentialPrincipal>MDC_AI__Gemini_AI-Principal</externalCredentialPrincipal>
-    </externalCredentialPrincipalAccesses>
 </PermissionSet>

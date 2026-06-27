@@ -1,6 +1,6 @@
 {
     "fileVersion": 0,
-    "serverMaxRevisionCounter": 103,
+    "serverMaxRevisionCounter": 128,
     "sourceMembers": {
         "CustomField__Code_Review__c.Issues_JSON__c": {
             "memberType": "CustomField",
@@ -34,7 +34,7 @@
         },
         "Profile__Admin": {
             "memberType": "Profile",
-            "serverRevisionCounter": 92,
+            "serverRevisionCounter": 126,
             "lastRetrievedFromServer": 69,
             "isNameObsolete": false
         },
@@ -46,26 +46,26 @@
         },
         "ApexClass__CodeForceSettingsController": {
             "memberType": "ApexClass",
-            "serverRevisionCounter": 88,
-            "lastRetrievedFromServer": 88,
+            "serverRevisionCounter": 112,
+            "lastRetrievedFromServer": 112,
             "isNameObsolete": false
         },
         "ApexClass__CodeForceSettingsControllerTest": {
             "memberType": "ApexClass",
-            "serverRevisionCounter": 45,
-            "lastRetrievedFromServer": 45,
+            "serverRevisionCounter": 127,
+            "lastRetrievedFromServer": 127,
             "isNameObsolete": false
         },
         "ApexClass__CodeReviewService": {
             "memberType": "ApexClass",
-            "serverRevisionCounter": 93,
-            "lastRetrievedFromServer": 93,
+            "serverRevisionCounter": 114,
+            "lastRetrievedFromServer": 114,
             "isNameObsolete": false
         },
         "ApexClass__CodeReviewServiceTest": {
             "memberType": "ApexClass",
-            "serverRevisionCounter": 47,
-            "lastRetrievedFromServer": 47,
+            "serverRevisionCounter": 128,
+            "lastRetrievedFromServer": 128,
             "isNameObsolete": false
         },
         "CustomTab__CodeForce_AI_Review": {
@@ -106,8 +106,8 @@
         },
         "PermissionSet__CodeForce_AI_User": {
             "memberType": "PermissionSet",
-            "serverRevisionCounter": 81,
-            "lastRetrievedFromServer": 81,
+            "serverRevisionCounter": 122,
+            "lastRetrievedFromServer": 122,
             "isNameObsolete": false
         },
         "LightningComponentBundle__codeforceReview": {
@@ -118,8 +118,8 @@
         },
         "LightningComponentBundle__codeforceSettings": {
             "memberType": "LightningComponentBundle",
-            "serverRevisionCounter": 51,
-            "lastRetrievedFromServer": 51,
+            "serverRevisionCounter": 116,
+            "lastRetrievedFromServer": 116,
             "isNameObsolete": false
         },
         "LightningComponentResource__codeforceReview/codeforceReview.js-meta.xml": {
@@ -148,26 +148,26 @@
         },
         "LightningComponentResource__codeforceSettings/codeforceSettings.js-meta.xml": {
             "memberType": "LightningComponentResource",
-            "serverRevisionCounter": 52,
-            "lastRetrievedFromServer": 52,
+            "serverRevisionCounter": 117,
+            "lastRetrievedFromServer": 117,
             "isNameObsolete": false
         },
         "LightningComponentResource__codeforceSettings/codeforceSettings.js": {
             "memberType": "LightningComponentResource",
-            "serverRevisionCounter": 53,
-            "lastRetrievedFromServer": 53,
+            "serverRevisionCounter": 118,
+            "lastRetrievedFromServer": 118,
             "isNameObsolete": false
         },
         "LightningComponentResource__codeforceSettings/codeforceSettings.css": {
             "memberType": "LightningComponentResource",
-            "serverRevisionCounter": 54,
-            "lastRetrievedFromServer": 54,
+            "serverRevisionCounter": 119,
+            "lastRetrievedFromServer": 119,
             "isNameObsolete": false
         },
         "LightningComponentResource__codeforceSettings/codeforceSettings.html": {
             "memberType": "LightningComponentResource",
-            "serverRevisionCounter": 55,
-            "lastRetrievedFromServer": 55,
+            "serverRevisionCounter": 120,
+            "lastRetrievedFromServer": 120,
             "isNameObsolete": false
         },
         "NamedCredential__Gemini_AI": {
@@ -180,6 +180,48 @@
             "memberType": "ExternalCredential",
             "serverRevisionCounter": 80,
             "lastRetrievedFromServer": 80,
+            "isNameObsolete": false
+        },
+        "CustomField__CodeForce_Config__c.API_Key__c": {
+            "memberType": "CustomField",
+            "serverRevisionCounter": 108,
+            "lastRetrievedFromServer": 108,
+            "isNameObsolete": false
+        },
+        "CustomField__CodeForce_Config__c.Base_URL__c": {
+            "memberType": "CustomField",
+            "serverRevisionCounter": 109,
+            "lastRetrievedFromServer": 109,
+            "isNameObsolete": false
+        },
+        "CustomField__CodeForce_Config__c.Model_Name__c": {
+            "memberType": "CustomField",
+            "serverRevisionCounter": 110,
+            "lastRetrievedFromServer": 110,
+            "isNameObsolete": false
+        },
+        "CustomField__CodeForce_Config__c.Provider__c": {
+            "memberType": "CustomField",
+            "serverRevisionCounter": 111,
+            "lastRetrievedFromServer": 111,
+            "isNameObsolete": false
+        },
+        "CustomObject__CodeForce_Config__c": {
+            "memberType": "CustomObject",
+            "serverRevisionCounter": 121,
+            "lastRetrievedFromServer": 121,
+            "isNameObsolete": false
+        },
+        "RemoteSiteSetting__Gemini_API": {
+            "memberType": "RemoteSiteSetting",
+            "serverRevisionCounter": 123,
+            "lastRetrievedFromServer": 123,
+            "isNameObsolete": false
+        },
+        "RemoteSiteSetting__OpenAI_API": {
+            "memberType": "RemoteSiteSetting",
+            "serverRevisionCounter": 124,
+            "lastRetrievedFromServer": 124,
             "isNameObsolete": false
         }
     }

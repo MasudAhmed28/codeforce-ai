@@ -1,9 +1,11 @@
+/**
+ * @description Core service for AI-powered code reviews.
+ *              Dynamically supports Gemini and OpenAI-compatible APIs
+ *              based on the CodeForce_Config__c Custom Setting.
+ */
 public with sharing class CodeReviewService {
 
-    private static final String NAMED_CREDENTIAL = 'Gemini_AI';
-    private static final String MODEL            = 'gemini-2.5-flash';
-    private static final String ENDPOINT_PATH    = '/v1beta/models/' + MODEL + ':generateContent';
-    private static final Integer TIMEOUT_MS      = 120000;
+    private static final Integer TIMEOUT_MS = 120000;
 
     @AuraEnabled
     public static ReviewResult reviewCode(String code, String language) {
@@ -11,11 +13,23 @@ public with sharing class CodeReviewService {
             throw new AuraHandledException('Please paste some code to review.');
         }
 
+        CodeForce_Config__c cfg = CodeForce_Config__c.getInstance();
+        if (String.isBlank(cfg.API_Key__c)) {
+            throw new AuraHandledException(
+                'No API key configured. Go to the CodeForce AI Settings tab to add your API key.'
+            );
+        }
+
+        String provider = cfg.Provider__c   != null ? cfg.Provider__c   : 'Gemini';
+        String model    = cfg.Model_Name__c != null ? cfg.Model_Name__c : 'gemini-2.5-flash';
+        String baseUrl  = cfg.Base_URL__c   != null ? cfg.Base_URL__c   : 'https://generativelanguage.googleapis.com';
+        String apiKey   = cfg.API_Key__c;
+
         try {
-            String prompt = buildPrompt(code, language);
-            String aiContent = callAI(prompt);
+            String prompt   = buildPrompt(code, language);
+            String aiContent = callAI(provider, model, baseUrl, apiKey, prompt);
             ReviewResult result = parseResponse(aiContent);
-            
+
             if (Schema.sObjectType.Code_Review__c.isCreateable()) {
                 Code_Review__c history = new Code_Review__c();
                 history.Language__c = language;
@@ -24,23 +38,16 @@ public with sharing class CodeReviewService {
                 history.Summary__c = result.summary != null && result.summary.length() > 255 ? result.summary.substring(0, 255) : result.summary;
                 String issuesJson = JSON.serialize(result.issues);
                 history.Issues_JSON__c = issuesJson.length() > 131000 ? issuesJson.substring(0, 131000) : issuesJson;
-                
+
                 insert history;
                 result.recordId = history.Id;
             }
-            
+
             return result;
         } catch (AuraHandledException ae) {
             throw ae;
         } catch (System.CalloutException ce) {
-            String msg = ce.getMessage();
-            if (msg.containsIgnoreCase('Named credential') || msg.containsIgnoreCase('unauthorized')) {
-                throw new AuraHandledException(
-                    'Gemini API key is not configured. Go to Setup → Named Credentials → ' +
-                    'External Credentials → Gemini AI → edit the NamedPrincipal to add your API key.'
-                );
-            }
-            throw new AuraHandledException('Review failed: ' + msg);
+            throw new AuraHandledException('Review failed (callout error): ' + ce.getMessage());
         } catch (Exception ex) {
             throw new AuraHandledException('Review failed: ' + ex.getMessage());
         }
@@ -64,47 +71,75 @@ public with sharing class CodeReviewService {
     }
 
     @TestVisible
-    private static String callAI(String prompt) {
+    private static String callAI(String provider, String model, String baseUrl, String apiKey, String prompt) {
         HttpRequest req = new HttpRequest();
-        req.setEndpoint('callout:' + NAMED_CREDENTIAL + ENDPOINT_PATH);
         req.setMethod('POST');
         req.setHeader('Content-Type', 'application/json');
         req.setTimeout(TIMEOUT_MS);
 
-        Map<String, Object> body = new Map<String, Object>{
-            'contents' => new List<Map<String, Object>>{
-                new Map<String, Object>{
-                    'parts' => new List<Map<String, String>>{
-                        new Map<String, String>{ 'text' => prompt }
+        if (provider == 'Gemini') {
+            req.setEndpoint(baseUrl + '/v1beta/models/' + model + ':generateContent?key=' + EncodingUtil.urlEncode(apiKey, 'UTF-8'));
+            Map<String, Object> body = new Map<String, Object>{
+                'contents' => new List<Map<String, Object>>{
+                    new Map<String, Object>{
+                        'parts' => new List<Map<String, String>>{
+                            new Map<String, String>{ 'text' => prompt }
+                        }
                     }
+                },
+                'generationConfig' => new Map<String, Object>{
+                    'temperature'      => 0.2,
+                    'maxOutputTokens'  => 8192,
+                    'responseMimeType' => 'application/json'
                 }
-            },
-            'generationConfig' => new Map<String, Object>{
-                'temperature'      => 0.2,
-                'maxOutputTokens'  => 8192,
-                'responseMimeType' => 'application/json'
-            }
-        };
-        req.setBody(JSON.serialize(body));
+            };
+            req.setBody(JSON.serialize(body));
+        } else {
+            // OpenAI-compatible format (OpenAI, DeepSeek, Groq, Mistral, Together AI, etc.)
+            req.setEndpoint(baseUrl + '/v1/chat/completions');
+            req.setHeader('Authorization', 'Bearer ' + apiKey);
+            Map<String, Object> body = new Map<String, Object>{
+                'model' => model,
+                'messages' => new List<Map<String, String>>{
+                    new Map<String, String>{ 'role' => 'user', 'content' => prompt }
+                },
+                'temperature' => 0.2,
+                'max_tokens' => 8192
+            };
+            req.setBody(JSON.serialize(body));
+        }
 
         HttpResponse res = new Http().send(req);
 
         if (res.getStatusCode() < 200 || res.getStatusCode() >= 300) {
             throw new AuraHandledException(
-                'Gemini returned HTTP ' + res.getStatusCode() + ': ' + res.getBody()
+                'AI API returned HTTP ' + res.getStatusCode() + ': ' + res.getBody()
             );
         }
 
         Map<String, Object> jsonRes = (Map<String, Object>) JSON.deserializeUntyped(res.getBody());
-        List<Object> candidates = (List<Object>) jsonRes.get('candidates');
-        if (candidates == null || candidates.isEmpty()) {
-            throw new AuraHandledException('Empty response from Gemini.');
+
+        if (provider == 'Gemini') {
+            // Gemini response: candidates[0].content.parts[0].text
+            List<Object> candidates = (List<Object>) jsonRes.get('candidates');
+            if (candidates == null || candidates.isEmpty()) {
+                throw new AuraHandledException('Empty response from Gemini.');
+            }
+            Map<String, Object> firstCandidate = (Map<String, Object>) candidates[0];
+            Map<String, Object> content        = (Map<String, Object>) firstCandidate.get('content');
+            List<Object> parts                 = (List<Object>) content.get('parts');
+            Map<String, Object> firstPart      = (Map<String, Object>) parts[0];
+            return (String) firstPart.get('text');
+        } else {
+            // OpenAI-compatible response: choices[0].message.content
+            List<Object> choices = (List<Object>) jsonRes.get('choices');
+            if (choices == null || choices.isEmpty()) {
+                throw new AuraHandledException('Empty response from AI provider.');
+            }
+            Map<String, Object> firstChoice = (Map<String, Object>) choices[0];
+            Map<String, Object> message     = (Map<String, Object>) firstChoice.get('message');
+            return (String) message.get('content');
         }
-        Map<String, Object> firstCandidate = (Map<String, Object>) candidates[0];
-        Map<String, Object> content        = (Map<String, Object>) firstCandidate.get('content');
-        List<Object> parts                 = (List<Object>) content.get('parts');
-        Map<String, Object> firstPart      = (Map<String, Object>) parts[0];
-        return (String) firstPart.get('text');
     }
 
     @TestVisible

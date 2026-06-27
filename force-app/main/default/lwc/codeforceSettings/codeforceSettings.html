@@ -5,18 +5,63 @@
             <lightning-icon icon-name="utility:settings" size="medium"></lightning-icon>
             <div class="header-text">
                 <h1>CodeForce AI — Settings</h1>
-                <p>Configure your Gemini API connection</p>
+                <p>Configure your AI provider, model, and API key</p>
             </div>
         </div>
     </div>
 
     <div class="settings-container">
-        <!-- ── Connection Status Card ── -->
-        <div class="status-card">
-            <div class="status-header">
-                <h2>Connection Status</h2>
+        <!-- ── Configuration Card ── -->
+        <div class="config-card">
+            <h2>AI Provider Configuration</h2>
+
+            <div class="form-row">
+                <lightning-combobox
+                    label="API Format"
+                    value={provider}
+                    options={providerOptions}
+                    onchange={handleProviderChange}
+                    class="form-field">
+                </lightning-combobox>
+
+                <lightning-input
+                    label="Base URL"
+                    value={baseUrl}
+                    onchange={handleBaseUrlChange}
+                    placeholder="https://api.openai.com"
+                    class="form-field form-field-wide">
+                </lightning-input>
+            </div>
+
+            <div class="form-row">
+                <lightning-input
+                    label="Model Name"
+                    value={model}
+                    onchange={handleModelChange}
+                    placeholder="e.g. gemini-2.5-flash, gpt-4o, deepseek-coder"
+                    class="form-field">
+                </lightning-input>
+
+                <lightning-input
+                    label="API Key"
+                    type="password"
+                    value={apiKey}
+                    onchange={handleApiKeyChange}
+                    placeholder={apiKeyPlaceholder}
+                    class="form-field">
+                </lightning-input>
+            </div>
+
+            <div class="action-bar">
                 <lightning-button
                     variant="brand"
+                    label={saveButtonLabel}
+                    onclick={handleSave}
+                    disabled={isSaving}
+                    icon-name="utility:save">
+                </lightning-button>
+                <lightning-button
+                    variant="neutral"
                     label={testButtonLabel}
                     onclick={handleTestConnection}
                     disabled={isTesting}
@@ -24,45 +69,34 @@
                 </lightning-button>
             </div>
 
-            <template lwc:if={connectionSuccess}>
+            <!-- Status banners -->
+            <template lwc:if={showSuccess}>
                 <div class="status-banner status-ok">
                     <lightning-icon icon-name="utility:success" variant="inverse" size="small"></lightning-icon>
-                    <span>{connectionMessage}</span>
+                    <span>{statusMessage}</span>
                 </div>
             </template>
 
-            <template lwc:if={connectionError}>
+            <template lwc:if={showError}>
                 <div class="status-banner status-error">
                     <lightning-icon icon-name="utility:error" variant="inverse" size="small"></lightning-icon>
-                    <span>{connectionMessage}</span>
-                </div>
-            </template>
-
-            <template lwc:if={showDefault}>
-                <div class="status-banner status-default">
-                    <lightning-icon icon-name="utility:info" size="small"></lightning-icon>
-                    <span>Click <strong>Test Connection</strong> to verify your Gemini API key is configured.</span>
+                    <span>{statusMessage}</span>
                 </div>
             </template>
         </div>
 
-        <!-- ── Setup Instructions Card ── -->
+        <!-- ── Quick Start Guide ── -->
         <div class="setup-card">
-            <h2>Setup Instructions</h2>
-            <p class="setup-intro">
-                CodeForce AI uses <strong>Google Gemini</strong> for AI-powered code reviews.
-                Follow these steps to connect your free API key:
-            </p>
-
+            <h2>Quick Start</h2>
             <div class="steps">
                 <div class="step">
                     <div class="step-number">1</div>
                     <div class="step-content">
-                        <h3>Get a Free Gemini API Key</h3>
+                        <h3>Choose Your AI Provider</h3>
                         <p>
-                            Go to <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener noreferrer">
-                            Google AI Studio</a> and click <strong>"Create API Key"</strong>.
-                            Copy the generated key.
+                            Select <strong>Gemini</strong> for Google's API, or <strong>OpenAI Compatible</strong>
+                            for OpenAI, DeepSeek, Groq, Mistral, Together AI, or any provider
+                            that supports the <code>/v1/chat/completions</code> format.
                         </p>
                     </div>
                 </div>
@@ -70,11 +104,15 @@
                 <div class="step">
                     <div class="step-number">2</div>
                     <div class="step-content">
-                        <h3>Open External Credentials</h3>
+                        <h3>Get Your API Key</h3>
                         <p>
-                            In Salesforce Setup, search for <strong>"Named Credentials"</strong>,
-                            then click the <strong>"External Credentials"</strong> tab.
-                            Find and click <strong>"Gemini AI"</strong>.
+                            <strong>Gemini:</strong> Get a free key at
+                            <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener noreferrer">Google AI Studio</a>.
+                            <br/>
+                            <strong>OpenAI:</strong> Get a key at
+                            <a href="https://platform.openai.com/api-keys" target="_blank" rel="noopener noreferrer">OpenAI Platform</a>.
+                            <br/>
+                            <strong>Others:</strong> Use the API key from your chosen provider.
                         </p>
                     </div>
                 </div>
@@ -82,51 +120,27 @@
                 <div class="step">
                     <div class="step-number">3</div>
                     <div class="step-content">
-                        <h3>Add Your API Key</h3>
+                        <h3>Save &amp; Test</h3>
                         <p>
-                            Under the <strong>"Principals"</strong> section, click the arrow next to <strong>NamedPrincipal</strong>
-                            and select <strong>"Edit"</strong>. Under <strong>Authentication Parameters</strong>, click <strong>Add</strong>.
-                            Set the <strong>Name</strong> to <code>ApiKey</code> and the <strong>Value</strong> to your Gemini API key. Click <strong>Save</strong>.
-                        </p>
-                    </div>
-                </div>
-
-                <div class="step">
-                    <div class="step-number">4</div>
-                    <div class="step-content">
-                        <h3>Grant Access to Users</h3>
-                        <p>
-                            Go to <strong>Setup → Permission Sets → CodeForce AI User → External Credential Principal Access</strong>.
-                            Click <strong>Edit</strong>, add <strong>"Gemini AI - NamedPrincipal"</strong> 
-                            to the Enabled list, and click <strong>Save</strong>.
-                            Then assign this permission set to users who need code review access.
-                        </p>
-                    </div>
-                </div>
-
-
-                <div class="step">
-                    <div class="step-number">5</div>
-                    <div class="step-content">
-                        <h3>Test the Connection</h3>
-                        <p>
-                            Click the <strong>"Test Connection"</strong> button above to verify everything is working.
-                            If successful, you're ready to review code!
+                            Paste your API key, choose a model, click <strong>Save</strong>,
+                            then click <strong>Test Connection</strong> to verify.
                         </p>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- ── Info Card ── -->
+        <!-- ── Supported Providers ── -->
         <div class="info-card">
             <lightning-icon icon-name="utility:info_alt" size="small"></lightning-icon>
             <div class="info-content">
-                <strong>About the Free Tier</strong>
+                <strong>Supported Providers</strong>
                 <p>
-                    The Gemini API free tier supports up to 15 requests per minute.
-                    This is sufficient for individual and small-team code reviews.
-                    Your API key and code are sent directly to Google's Gemini API — no intermediary servers.
+                    <strong>Gemini format:</strong> Google Gemini (all models — gemini-2.5-flash, gemini-2.5-pro, etc.)
+                    <br/>
+                    <strong>OpenAI Compatible format:</strong> OpenAI (gpt-4o, gpt-4.1), DeepSeek (deepseek-coder, deepseek-chat),
+                    Groq (llama-3.3-70b), Mistral (mistral-large), Together AI, and any provider that implements
+                    the OpenAI chat completions API. Just change the Base URL to point to your provider.
                 </p>
             </div>
         </div>

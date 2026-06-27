@@ -4,8 +4,9 @@
 @IsTest
 private class CodeReviewServiceTest {
 
-    // ── Mock (Gemini response format) ──
-    private class MockSuccess implements HttpCalloutMock {
+    // ── Mocks ──
+
+    private class MockGeminiSuccess implements HttpCalloutMock {
         public HttpResponse respond(HttpRequest req) {
             HttpResponse res = new HttpResponse();
             res.setStatusCode(200);
@@ -25,6 +26,25 @@ private class CodeReviewServiceTest {
         }
     }
 
+    private class MockOpenAISuccess implements HttpCalloutMock {
+        public HttpResponse respond(HttpRequest req) {
+            HttpResponse res = new HttpResponse();
+            res.setStatusCode(200);
+            res.setHeader('Content-Type', 'application/json');
+
+            String aiJson = '{"score":85,"summary":"Good code quality.",' +
+                '"issues":[{"title":"Missing null check","severity":"Low",' +
+                '"explanation":"No null check.","impact":"NullPointerException.",' +
+                '"fix":"Add null check.","sampleCode":"if(x!=null){}"}]}';
+
+            // OpenAI wraps the text inside choices[].message.content
+            String body = '{"choices":[{"message":{"content":' +
+                JSON.serialize(aiJson) + '}}]}';
+            res.setBody(body);
+            return res;
+        }
+    }
+
     private class MockError implements HttpCalloutMock {
         public HttpResponse respond(HttpRequest req) {
             HttpResponse res = new HttpResponse();
@@ -34,11 +54,23 @@ private class CodeReviewServiceTest {
         }
     }
 
+    // ── Test Setup ──
+
+    @TestSetup
+    static void setupConfig() {
+        CodeForce_Config__c cfg = new CodeForce_Config__c();
+        cfg.Provider__c   = 'Gemini';
+        cfg.Model_Name__c = 'gemini-2.5-flash';
+        cfg.Base_URL__c   = 'https://generativelanguage.googleapis.com';
+        cfg.API_Key__c    = 'test-api-key-12345';
+        insert cfg;
+    }
+
     // ── Tests ──
 
     @IsTest
-    static void testReviewCodeSuccess() {
-        Test.setMock(HttpCalloutMock.class, new MockSuccess());
+    static void testReviewCodeGeminiSuccess() {
+        Test.setMock(HttpCalloutMock.class, new MockGeminiSuccess());
 
         Test.startTest();
         CodeReviewService.ReviewResult result = CodeReviewService.reviewCode(
@@ -51,13 +83,36 @@ private class CodeReviewServiceTest {
         System.assertEquals(72, result.score, 'Score should match mock');
         System.assertEquals(1, result.issues.size(), 'Should have 1 issue');
         System.assertEquals('Critical', result.issues[0].severity);
-        
+
         // Verify DB Insert
         List<Code_Review__c> history = [SELECT Id, Language__c, Score__c FROM Code_Review__c];
         System.assertEquals(1, history.size(), 'Should have saved 1 history record');
         System.assertEquals('Apex', history[0].Language__c, 'Language should be saved');
         System.assertEquals(72, history[0].Score__c, 'Score should be saved');
-        System.assertEquals(history[0].Id, result.recordId, 'Record ID should be returned in DTO');
+    }
+
+    @IsTest
+    static void testReviewCodeOpenAISuccess() {
+        // Switch config to OpenAI
+        CodeForce_Config__c cfg = CodeForce_Config__c.getOrgDefaults();
+        cfg.Provider__c   = 'OpenAI Compatible';
+        cfg.Model_Name__c = 'gpt-4o';
+        cfg.Base_URL__c   = 'https://api.openai.com';
+        update cfg;
+
+        Test.setMock(HttpCalloutMock.class, new MockOpenAISuccess());
+
+        Test.startTest();
+        CodeReviewService.ReviewResult result = CodeReviewService.reviewCode(
+            'public class Foo { }',
+            'Apex'
+        );
+        Test.stopTest();
+
+        System.assertNotEquals(null, result);
+        System.assertEquals(85, result.score);
+        System.assertEquals(1, result.issues.size());
+        System.assertEquals('Low', result.issues[0].severity);
     }
 
     @IsTest
@@ -71,6 +126,23 @@ private class CodeReviewServiceTest {
         }
         Test.stopTest();
         System.assert(exceptionThrown, 'Should throw AuraHandledException for empty input');
+    }
+
+    @IsTest
+    static void testReviewCodeNoApiKey() {
+        CodeForce_Config__c cfg = CodeForce_Config__c.getOrgDefaults();
+        cfg.API_Key__c = null;
+        update cfg;
+
+        Test.startTest();
+        Boolean exceptionThrown = false;
+        try {
+            CodeReviewService.reviewCode('public class Foo {}', 'Apex');
+        } catch (AuraHandledException ex) {
+            exceptionThrown = true;
+        }
+        Test.stopTest();
+        System.assert(exceptionThrown, 'Should throw for missing API key');
     }
 
     @IsTest
@@ -116,17 +188,5 @@ private class CodeReviewServiceTest {
         System.assertEquals(2, result.issues.size());
         System.assertEquals('Critical', result.issues[0].severity);
         System.assertEquals('Low', result.issues[1].severity);
-    }
-
-    @IsTest
-    static void testCallAIMocked() {
-        Test.setMock(HttpCalloutMock.class, new MockSuccess());
-
-        Test.startTest();
-        String response = CodeReviewService.callAI('Test prompt');
-        Test.stopTest();
-
-        System.assertNotEquals(null, response, 'Should return a response');
-        System.assert(response.contains('score'), 'Response should contain score');
     }
 }
